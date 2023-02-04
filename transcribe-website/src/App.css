@@ -1,0 +1,36 @@
+.App {
+  background-color: rgb(124, 124, 124);
+}
+
+.body {
+  display: flex;
+}
+
+.image-container {
+  width: 600px;
+  height: 800px;
+  border: 4px solid black;
+  flex: auto;
+}
+
+.form-container {
+  flex: auto;
+  display: flex;
+  flex-direction: column;
+  height: 400px;
+}
+
+form {
+  height: 100%;
+}
+
+.transcription-box {
+  height: 70%;
+  width: 100%;
+  padding: auto;
+  display: block;
+}
+
+.username-box {
+  display: block;
+}
