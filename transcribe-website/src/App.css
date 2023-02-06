@@ -39,3 +39,7 @@ form {
 .username-box {
   display: block;
 }
+
+.completed-id {
+  padding: .3rem;
+}

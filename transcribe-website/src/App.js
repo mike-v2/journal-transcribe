@@ -1,13 +1,13 @@
 import './App.css';
 import { useEffect, useRef, useState } from 'react';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs, doc, setDoc } from 'firebase/firestore/lite';
+import { getFirestore, collection, getDoc, getDocs, doc, setDoc } from 'firebase/firestore/lite';
 
 function App() {
   const transcriptionBox = useRef(null);
   const [image, setImage] = useState(null);
-  const completedIDs = [];
-  let currentID = -1;
+  const [completedIDs, setCompletedIDs] = useState([]);
+  const [currentID, setCurrentID] = useState(-1);
 
   const firebaseConfig = {
     apiKey: "AIzaSyAc1YOLbEfxfEGeJuLonxUTCdp7HmBD2Jw",
@@ -27,7 +27,7 @@ function App() {
 
   function importAll(r) {
     let images = {};
-    r.keys().map(item => { images[item.replace('./', '')] = r(item); });
+    r.keys().map(item => { images[item.replace('./', '').replace('.jpg', '')] = r(item); });
     return images;
   }
 
@@ -36,18 +36,7 @@ function App() {
   console.log(`found ${Object.keys(images).length} images`);
   console.log(images);
 
-  const createBlankFirebaseEntries = async (e) => {
-    console.log(`creating ${Object.keys(images).length} firebase entries`);
-    const year = '1948';
-    for (const imageName in images) {
-      const pageNumStr = imageName.split('-')[1];
-      await setDoc(doc(db, 'pages', 'page-' + pageNumStr), {
-        imageID: year + '-' + pageNumStr,
-        isCompleted: false,
-        text: "",
-      });
-    }
-  }
+  
 
 
   async function displayNextJournalPage() {
@@ -60,11 +49,11 @@ function App() {
       console.log("checking page: " + id);
 
       if (pageData.isCompleted === false && completedIDs.includes(id) === false) {
-        currentID = id;
-        console.log('current ID: ' + currentID);
-        const pageNumber = currentID.split('-')[1];
-        console.log("getting page number: " + pageNumber);
-        setImage(images['page-' + pageNumber + '.jpg']);
+        setCurrentID(id);
+        console.log('current ID: ' + id);
+        const pageNumber = getPageNumberFromImageID(id);
+        console.log(`getting page number ${pageNumber}: ${images[id]}`);
+        setImage(images[getFileNameFromPageNumber(pageNumber)]);
         return;
       }
     }
@@ -72,21 +61,47 @@ function App() {
     console.log("no more images");
   }
 
+  function getFileNameFromPageNumber(pageNumber) {
+    return 'page-' + pageNumber;
+  }
+
+  function getPageNumberFromImageID(id) {
+    return id.split('-')[1]
+  }
+
   async function setTranscription(text) {
-    await setDoc(doc(db, 'pages', 'test-page-1'), {
+    const docName = getFileNameFromPageNumber(getPageNumberFromImageID(currentID));
+    await setDoc(doc(db, 'pages', docName), {
       isCompleted: true,
       text: text,
-    });
+    }, {merge: true});
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     setTranscription(transcriptionBox.current.value);
-    completedIDs.push(currentID);
-    currentID = -1;
+    setCompletedIDs([...completedIDs, currentID]);
+    console.log("Completed ID: " + currentID);
     transcriptionBox.current.value = "";
     displayNextJournalPage();
+  }
+
+  const handleKeydown = (e) => {
+    
+  }
+
+  const createBlankFirebaseEntries = async (e) => {
+    console.log(`creating ${Object.keys(images).length} firebase entries`);
+    const year = '1948';
+    for (const imageID in images) {
+      const pageNumStr = getPageNumberFromImageID(imageID);
+      await setDoc(doc(db, 'pages', 'page-' + pageNumStr), {
+        imageID: year + '-' + pageNumStr,
+        isCompleted: false,
+        text: "",
+      });
+    }
   }
 
   return (
@@ -97,14 +112,14 @@ function App() {
         </div>
         <div className='form-container'>
           <form onSubmit={handleSubmit}>
-            <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" rows="4" cols="50" placeholder='Enter Transcription'></textarea>
+            <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" rows="4" cols="50" placeholder='Enter Transcription' onKeyDown={handleKeydown}></textarea>
             <input className='username-box' type='text' placeholder='username' required></input>
             <input type='submit' value="Submit"></input>
             {/*
             <input type='button' value="Create New Firebase Entries" onClick={createBlankFirebaseEntries}></input>
             */}
             {completedIDs.map((id) => {
-              <span>id</span>
+              return <span className='completed-id'>{id}</span>;
             })}
           </form>
         </div>
