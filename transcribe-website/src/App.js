@@ -22,7 +22,7 @@ function App() {
   const db = getFirestore(app);
 
   useEffect(() => {
-    getJournalPage();
+    displayNextJournalPage();
   }, []);
 
   function importAll(r) {
@@ -31,15 +31,28 @@ function App() {
     return images;
   }
 
+  //webpack stores images on build
   const images = importAll(require.context('../public/images/1948', false, /\.jpg/));
+  console.log(`found ${Object.keys(images).length} images`);
   console.log(images);
 
-  
+  const createBlankFirebaseEntries = async (e) => {
+    console.log(`creating ${Object.keys(images).length} firebase entries`);
+    const year = '1948';
+    for (const imageName in images) {
+      const pageNumStr = imageName.split('-')[1];
+      await setDoc(doc(db, 'pages', 'page-' + pageNumStr), {
+        imageID: year + '-' + pageNumStr,
+        isCompleted: false,
+        text: "",
+      });
+    }
+  }
 
 
-  async function getJournalPage() {
-    const pagesCollection = collection(db, 'pages');
-    const pagesDocs = await getDocs(pagesCollection);
+  async function displayNextJournalPage() {
+    const pagesRef = collection(db, 'pages');
+    const pagesDocs = await getDocs(pagesRef);
 
     for (let i = 0; i < pagesDocs.docs.length; i++) {
       const pageData = pagesDocs.docs[i].data();
@@ -70,8 +83,10 @@ function App() {
     e.preventDefault();
 
     setTranscription(transcriptionBox.current.value);
+    completedIDs.push(currentID);
+    currentID = -1;
     transcriptionBox.current.value = "";
-    getJournalPage();
+    displayNextJournalPage();
   }
 
   return (
@@ -85,6 +100,12 @@ function App() {
             <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" rows="4" cols="50" placeholder='Enter Transcription'></textarea>
             <input className='username-box' type='text' placeholder='username' required></input>
             <input type='submit' value="Submit"></input>
+            {/*
+            <input type='button' value="Create New Firebase Entries" onClick={createBlankFirebaseEntries}></input>
+            */}
+            {completedIDs.map((id) => {
+              <span>id</span>
+            })}
           </form>
         </div>
       </div>
