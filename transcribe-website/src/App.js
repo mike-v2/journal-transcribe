@@ -2,6 +2,7 @@ import './App.css';
 import { useEffect, useRef, useState } from 'react';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDoc, getDocs, doc, setDoc } from 'firebase/firestore/lite';
+import SpeechToText from './SpeechToText';
 
 function App() {
   const transcriptionBox = useRef(null);
@@ -77,6 +78,10 @@ function App() {
     }, {merge: true});
   }
 
+  const updateVoiceText = (text) => {
+    transcriptionBox.current.value += text;
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -122,6 +127,7 @@ function App() {
               return <span className='completed-id'>{id}</span>;
             })}
           </form>
+          <SpeechToText updateVoiceText={updateVoiceText}/>
         </div>
       </div>
     </div>
