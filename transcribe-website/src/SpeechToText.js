@@ -27,7 +27,7 @@ const SpeechToText = (props) => {
 
 
   if (!browserSupportsSpeechRecognition) {
-    return <span>Browser doesn't support speech recognition.</span>;
+    return <span>Use Google Chrome for speech recognition.</span>;
   }
 
   
