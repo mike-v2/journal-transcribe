@@ -15,7 +15,20 @@ const SpeechToText = (props) => {
   });
 
   useEffect(() => {
-    const newText = finalTranscript.substring(voiceText.length);
+    let newText = finalTranscript.substring(voiceText.length);
+    
+    newText = newText.replace(' period', '.');
+    newText = newText.replace(' comma', ',');
+    newText = newText.replace(' question mark', '?');
+
+    //capitalize first letter. Assume transcript starting at new sentence
+    newText = newText.substring(0, 1).toUpperCase() + newText.substring(1);
+
+    //capitalize first letter of sentence
+    newText = newText.replace(/\. [a-z]/, function(match) {
+      return match.toUpperCase();
+    });
+
     console.log("new text = " + newText);
     setVoiceText(finalTranscript);
     props.updateVoiceText(newText);
