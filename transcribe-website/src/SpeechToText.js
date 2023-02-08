@@ -4,10 +4,9 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 const SpeechToText = (props) => {
   const [voiceText, setVoiceText] = useState("");
 
-  
-
   const {
     transcript,
+    finalTranscript,
     listening,
     resetTranscript,
     browserSupportsSpeechRecognition
@@ -16,21 +15,15 @@ const SpeechToText = (props) => {
   });
 
   useEffect(() => {
-    const newText = transcript.substring(voiceText.length);
+    const newText = finalTranscript.substring(voiceText.length);
     console.log("new text = " + newText);
-    setVoiceText(transcript);
+    setVoiceText(finalTranscript);
     props.updateVoiceText(newText);
-    // setTimeout(() => {
-
-    // }, 1000);
-  }, [transcript])
-
+  }, [finalTranscript])
 
   if (!browserSupportsSpeechRecognition) {
     return <span>Use Google Chrome for speech recognition.</span>;
   }
-
-  
 
   function handleStartListening(e) {
     SpeechRecognition.startListening({
