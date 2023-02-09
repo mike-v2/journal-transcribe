@@ -17,9 +17,14 @@ const SpeechToText = (props) => {
   useEffect(() => {
     let newText = finalTranscript.substring(voiceText.length);
     
-    newText = newText.replace(' period', '.');
-    newText = newText.replace(' comma', ',');
-    newText = newText.replace(' question mark', '?');
+    newText = newText.replace(/ *period/g, '.');
+    newText = newText.replace(/ *comma/g, ',');
+    newText = newText.replace(/ *question mark/g, '?');
+    newText = newText.replace(/ *new line/g, '\n');
+    newText = newText.replace(/ *semicolon/g, ';');
+
+    //if first character is space, delete
+    newText = " " + newText.trimStart();
 
     //capitalize first letter. Assume transcript starting at new sentence
     newText = newText.substring(0, 1).toUpperCase() + newText.substring(1);
@@ -54,7 +59,7 @@ const SpeechToText = (props) => {
       <button onClick={handleStartListening}>Start</button>
       <button onClick={handleStopListening}>Stop</button>
       <button onClick={resetTranscript}>Reset</button>
-      <p>{transcript}</p>
+      <textarea className='transcription-box' rows="4" cols="50" placeholder='Temp Transcription' value={transcript}></textarea>
     </div>
   );
 };

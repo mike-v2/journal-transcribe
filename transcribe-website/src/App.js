@@ -48,7 +48,7 @@ function App() {
       resetImage();
       displayNextJournalPage();
     }
-  }, [skippedIDs]);
+  }, [skippedIDs, completedIDs]);
 
   async function displayNextJournalPage() {
     const pagesRef = collection(db, 'pages');
@@ -182,10 +182,11 @@ function App() {
         </div>
         <div className='form-container'>
           <form onSubmit={handleSubmit}>
-            <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" rows="4" cols="50" placeholder='Enter Transcription' onKeyDown={handleKeydown}></textarea>
             <input className='username-box' type='text' placeholder='username' required></input>
             <input type='button' value='Skip' onClick={handleSkip}></input>
             <input type='submit' value="Submit"></input>
+            <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" rows="20" cols="50" placeholder='Enter Transcription' onKeyDown={handleKeydown}></textarea>
+            
             {/*
                         <input type='button' value="Create New Firebase Entries" onClick={createBlankFirebaseEntries}></input>
             */}
