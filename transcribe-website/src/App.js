@@ -1,15 +1,17 @@
 import './App.css';
 import { useEffect, useRef, useState } from 'react';
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDoc, getDocs, doc, setDoc } from 'firebase/firestore/lite';
 import SpeechToText from './SpeechToText';
+
+import { getDatabase, ref, onDisconnect, update, get } from "firebase/database";
+
 
 function App() {
   const transcriptionBox = useRef(null);
   const [image, setImage] = useState(null);
   const [completedIDs, setCompletedIDs] = useState([]);
   const [currentID, setCurrentID] = useState("");
-  const [db, setDB] = useState(null);
+  const [realtimeDB, setRealtimeDB] = useState(null);
   const [skippedIDs, setSkippedIDs] = useState([]);
 
   const firebaseConfig = {
@@ -18,7 +20,8 @@ function App() {
     projectId: "journal-transcribe",
     storageBucket: "journal-transcribe.appspot.com",
     messagingSenderId: "845025637508",
-    appId: "1:845025637508:web:2d1b689bb028146ed03ed1"
+    appId: "1:845025637508:web:2d1b689bb028146ed03ed1",
+    databaseURL: "https://journal-transcribe-default-rtdb.firebaseio.com"
   };
 
   //webpack stores images on build
@@ -28,8 +31,8 @@ function App() {
 
   useEffect(() => {
     const app = initializeApp(firebaseConfig);
-    const database = getFirestore(app);
-    setDB(database);
+    const db = getDatabase(app);
+    setRealtimeDB(db);
     
     //on unmount
     return () => {
@@ -38,64 +41,68 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (db && currentID === "") {
+    if (realtimeDB && currentID === "") {
       displayNextJournalPage();
     }
-  }, [db]);
+  }, [realtimeDB]);
 
   useEffect(() => {
-    if (db) {
+    if (realtimeDB) {
       resetImage();
       displayNextJournalPage();
     }
   }, [skippedIDs, completedIDs]);
 
   async function displayNextJournalPage() {
-    const pagesRef = collection(db, 'pages');
-    const pagesDocs = await getDocs(pagesRef);
+    const pagesRef = ref(realtimeDB, '/pages/');
 
-    for (let i = 0; i < pagesDocs.docs.length; i++) {
-      const pageData = pagesDocs.docs[i].data();
-      const id = pageData.imageID;
-      console.log("checking page: " + id);
+    get(pagesRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        console.log(data);
 
-      if (pageData.isCompleted === false && completedIDs.includes(id) === false && skippedIDs.includes(id) === false /* && pageData.isInProgress === false */) {
-        console.log("Setting current id: " + id);
-        setCurrentID(id);
-        const pageNumber = getPageNumberFromImageID(id);
-        console.log(`getting page number ${pageNumber}: ${images[getFileNameFromImageID(id)]}`);
+        for (let page in data) {
+          const imageID = data[page].imageID;
+          const isCompleted = data[page].isCompleted;
+          const isInProgress = data[page].isInProgress;
+          console.log("checking page: " + imageID);
 
-        // const docName = getFileNameFromImageID(id);
-        // await setDoc(doc(db, 'pages', docName), {
-        //   isInProgress: true
-        // }, { merge: true });
+          if (isCompleted === false && isInProgress === false && completedIDs.includes(imageID) === false && skippedIDs.includes(imageID) === false) {
+            console.log("Setting current id: " + imageID);
+            setCurrentID(imageID);
+            const pageNumber = getPageNumberFromImageID(imageID);
+            console.log(`getting page number ${pageNumber}: ${images[getFileNameFromImageID(imageID)]}`);
 
-        //const isInProgressField = firebase.database().ref("isInProgress");
-        //isInProgressField.onDisconnect().set(false);
-        
-        setImage(images[getFileNameFromPageNumber(pageNumber)]);
-        return;
+            const updates = {};
+            updates['pages/' + getFileNameFromImageID(imageID) + '/isInProgress'] = true;
+            update(ref(realtimeDB), updates);
+
+            const isInProgressRef = ref(realtimeDB, 'pages/' + getFileNameFromImageID(imageID) + '/isInProgress');
+            onDisconnect(isInProgressRef).set(false);
+
+            setImage(images[getFileNameFromPageNumber(pageNumber)]);
+            return;
+          }
+
+          console.log("no more images");
+        }
       }
-    }
-
-    console.log("no more images");
+    })
   }
 
   async function setTranscription(text) {
-    const docName = getFileNameFromImageID(currentID);
-    await setDoc(doc(db, 'pages', docName), {
-      isCompleted: true,
-      text: text,
-    }, {merge: true});
+    const updates = {};
+    updates['pages/' + getFileNameFromImageID(currentID) + '/isCompleted'] = true;
+    updates['pages/' + getFileNameFromImageID(currentID) + '/text'] = text;
+    update(ref(realtimeDB), updates);
   }
 
   async function releaseCurrentDocument() {
     if (currentID === "") return;
 
-    const docName = getFileNameFromImageID(currentID);
-    await setDoc(doc(db, 'pages', docName), {
-      isInProgress: false,
-    }, { merge: true });
+    const updates = {};
+    updates['pages/' + getFileNameFromImageID(currentID) + '/isInProgress'] = false;
+    update(ref(realtimeDB), updates);
   }
 
   const updateVoiceText = (text) => {
@@ -149,29 +156,22 @@ function App() {
   }
 
   const createBlankFirebaseEntries = async (e) => {
-    //add new entries
-    /*
     console.log(`creating ${Object.keys(images).length} firebase entries`);
     const year = '1948';
     for (const imageID in images) {
       const pageNumStr = getPageNumberFromImageID(imageID);
-      await setDoc(doc(db, 'pages', 'page-' + pageNumStr), {
-        imageID: year + '-' + pageNumStr,
-        isCompleted: false,
-        text: "",
-      });
-    }
-    */
+      // set(ref(realtimeDB, 'pages/' + getFileNameFromPageNumber(pageNumStr)), {
+      //   imageID: year + '-' + pageNumStr,
+      //   isCompleted: false,
+      //   isInProgress: false,
+      //   completedByUser: "",
+      //   text: "",
+      // });
 
-    //edit entries
-    /* 
-    for (const imageID in images) {
-      const pageNumStr = getPageNumberFromImageID(imageID);
-      await setDoc(doc(db, 'pages', 'page-' + pageNumStr), {
-        
-      }, { merge: true });
-    } 
-    */
+      const updates = {};
+      updates['pages/' + getFileNameFromPageNumber(pageNumStr) + '/isInProgress'] = false;
+      update(ref(realtimeDB), updates);
+    }
   }
 
   return (
@@ -185,11 +185,11 @@ function App() {
             <input className='username-box' type='text' placeholder='username' required></input>
             <input type='button' value='Skip' onClick={handleSkip}></input>
             <input type='submit' value="Submit"></input>
-            <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" rows="20" cols="50" placeholder='Enter Transcription' onKeyDown={handleKeydown}></textarea>
-            
-            {/*
-                        <input type='button' value="Create New Firebase Entries" onClick={createBlankFirebaseEntries}></input>
+            {/*<input type='button' value="Create New Firebase Entries" onClick={createBlankFirebaseEntries}></input>
             */}
+
+            <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" rows="20" cols="50" placeholder='Enter Transcription' onKeyDown={handleKeydown}></textarea>
+
             {completedIDs.map((id) => {
               return <span className='completed-id'>{id}</span>;
             })}

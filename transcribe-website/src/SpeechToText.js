@@ -24,10 +24,12 @@ const SpeechToText = (props) => {
     newText = newText.replace(/ *semicolon/g, ';');
 
     //if first character is space, delete
-    newText = " " + newText.trimStart();
+    newText = newText.trimStart();
 
     //capitalize first letter. Assume transcript starting at new sentence
     newText = newText.substring(0, 1).toUpperCase() + newText.substring(1);
+
+    newText = " " + newText;
 
     //capitalize first letter of sentence
     newText = newText.replace(/\. [a-z]/, function(match) {
