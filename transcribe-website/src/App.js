@@ -2,9 +2,11 @@ import './App.css';
 import { useEffect, useRef, useState } from 'react';
 import { initializeApp } from 'firebase/app';
 import SpeechToText from './SpeechToText';
+import InsertDate from './InsertDate';
 
 import { getDatabase, ref, onDisconnect, update, get } from "firebase/database";
 
+const year = '1948';
 
 function App() {
   const transcriptionBox = useRef(null);
@@ -109,6 +111,11 @@ function App() {
     transcriptionBox.current.value += text;
   }
 
+  function writeDateToTextArea(text) {
+    transcriptionBox.current.value += text;
+    transcriptionBox.current.value += "\n";
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -157,7 +164,7 @@ function App() {
 
   const createBlankFirebaseEntries = async (e) => {
     console.log(`creating ${Object.keys(images).length} firebase entries`);
-    const year = '1948';
+    
     for (const imageID in images) {
       const pageNumStr = getPageNumberFromImageID(imageID);
       // set(ref(realtimeDB, 'pages/' + getFileNameFromPageNumber(pageNumStr)), {
@@ -185,6 +192,7 @@ function App() {
             <input className='username-box' type='text' placeholder='username' required></input>
             <input type='button' value='Skip' onClick={handleSkip}></input>
             <input type='submit' value="Submit"></input>
+            <InsertDate year={year} writeDate={writeDateToTextArea}/>
             {/*<input type='button' value="Create New Firebase Entries" onClick={createBlankFirebaseEntries}></input>
             */}
 

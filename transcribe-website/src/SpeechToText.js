@@ -22,6 +22,7 @@ const SpeechToText = (props) => {
     newText = newText.replace(/ *question mark/g, '?');
     newText = newText.replace(/ *new line/g, '\n');
     newText = newText.replace(/ *semicolon/g, ';');
+    newText = newText.replace(/ *hyphen/g, '-');
 
     //if first character is space, delete
     newText = newText.trimStart();
