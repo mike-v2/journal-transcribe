@@ -47,12 +47,16 @@ const SpeechToText = (props) => {
   }
 
   function handleStartListening(e) {
+    e.preventDefault(); //submits form 
+    
     SpeechRecognition.startListening({
       continuous: true
     });
   }
 
   function handleStopListening(e) {
+    e.preventDefault(); //submits form 
+
     SpeechRecognition.stopListening();
   }
 

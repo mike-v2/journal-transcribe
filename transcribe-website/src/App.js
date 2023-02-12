@@ -200,22 +200,19 @@ function App() {
           <img src={image} className='image-box'></img>
         </div>
         <div className='form-container'>
-          <form onSubmit={handleSubmit}>
-            <InsertDate year={year} writeDate={writeDateToTextArea}/>
-            <button onClick={handleUnknownWord}>Unknown Word<br/>???</button>
-            <button onClick={handleArticle}>Article<br />***article***</button>
+          <InsertDate year={year} writeDate={writeDateToTextArea} />
+          <button onClick={handleUnknownWord}>Unknown Word<br />???</button>
+          <button onClick={handleArticle}>Article<br />***article***</button>
 
-            <SpeechToText updateVoiceText={updateVoiceText} />
-            {/*<input type='button' value="Create New Firebase Entries" onClick={createBlankFirebaseEntries}></input>
+          <SpeechToText updateVoiceText={updateVoiceText} />
+          {/*<input type='button' value="Create New Firebase Entries" onClick={createBlankFirebaseEntries}></input>
             */}
 
-            <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" rows="20" cols="50" placeholder='Enter Transcription'></textarea>
-            <input type='submit' value="Submit"></input>
-            {completedIDs.map((id) => {
-              return <span className='completed-id'>{id}</span>;
-            })}
-          </form>
-          
+          <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" rows="20" cols="50" placeholder='Enter Transcription'></textarea>
+          <input type='submit' value="Submit" onClick={handleSubmit}></input>
+          {completedIDs.map((id) => {
+            return <span className='completed-id'>{id}</span>;
+          })}
         </div>
       </div>
     </div>
