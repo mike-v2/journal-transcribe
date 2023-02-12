@@ -14,7 +14,6 @@ function App() {
   const [completedIDs, setCompletedIDs] = useState([]);
   const [currentID, setCurrentID] = useState("");
   const [realtimeDB, setRealtimeDB] = useState(null);
-  const [skippedIDs, setSkippedIDs] = useState([]);
 
   const firebaseConfig = {
     apiKey: "AIzaSyAc1YOLbEfxfEGeJuLonxUTCdp7HmBD2Jw",
@@ -53,7 +52,7 @@ function App() {
       resetImage();
       displayNextJournalPage();
     }
-  }, [skippedIDs, completedIDs]);
+  }, [completedIDs]);
 
   async function displayNextJournalPage() {
     const pagesRef = ref(realtimeDB, '/pages/');
@@ -69,7 +68,7 @@ function App() {
           const isInProgress = data[page].isInProgress;
           console.log("checking page: " + imageID);
 
-          if (isCompleted === false && isInProgress === false && completedIDs.includes(imageID) === false && skippedIDs.includes(imageID) === false) {
+          if (isCompleted === false && isInProgress === false && completedIDs.includes(imageID) === false) {
             console.log("Setting current id: " + imageID);
             setCurrentID(imageID);
             const pageNumber = getPageNumberFromImageID(imageID);
@@ -145,18 +144,6 @@ function App() {
     setCurrentID("");
   }
 
-  const handleSkip = (e) => {
-    if (currentID !== "") {
-      console.log("Skipping id: " + currentID);
-      //setting skippedIDs triggers useEffect
-      setSkippedIDs([...skippedIDs, currentID]);
-    }
-  }
-
-  const handleKeydown = (e) => {
-    
-  }
-
   function getFileNameFromPageNumber(pageNumber) {
     return 'page-' + pageNumber;
   }
@@ -194,6 +181,18 @@ function App() {
     }
   }
 
+  const handleUnknownWord = (e) => {
+    e.preventDefault();
+
+    transcriptionBox.current.value += "???";
+  }
+
+  const handleArticle = (e) => {
+    e.preventDefault();
+
+    transcriptionBox.current.value += "***article***";
+  }
+
   return (
     <div className="App">
       <div className='body'>
@@ -202,20 +201,21 @@ function App() {
         </div>
         <div className='form-container'>
           <form onSubmit={handleSubmit}>
-            <input className='username-box' type='text' placeholder='username' required></input>
-            <input type='button' value='Skip' onClick={handleSkip}></input>
-            <input type='submit' value="Submit"></input>
             <InsertDate year={year} writeDate={writeDateToTextArea}/>
+            <button onClick={handleUnknownWord}>Unknown Word<br/>???</button>
+            <button onClick={handleArticle}>Article<br />***article***</button>
+
+            <SpeechToText updateVoiceText={updateVoiceText} />
             {/*<input type='button' value="Create New Firebase Entries" onClick={createBlankFirebaseEntries}></input>
             */}
 
-            <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" rows="20" cols="50" placeholder='Enter Transcription' onKeyDown={handleKeydown}></textarea>
-
+            <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" rows="20" cols="50" placeholder='Enter Transcription'></textarea>
+            <input type='submit' value="Submit"></input>
             {completedIDs.map((id) => {
               return <span className='completed-id'>{id}</span>;
             })}
           </form>
-          <SpeechToText updateVoiceText={updateVoiceText}/>
+          
         </div>
       </div>
     </div>

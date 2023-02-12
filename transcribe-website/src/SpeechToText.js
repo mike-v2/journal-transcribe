@@ -58,11 +58,10 @@ const SpeechToText = (props) => {
 
   return (
     <div>
-      <p>Microphone: {listening ? 'on' : 'off'}</p>
-      <button onClick={handleStartListening}>Start</button>
-      <button onClick={handleStopListening}>Stop</button>
-      <button onClick={resetTranscript}>Reset</button>
-      <textarea className='transcription-box' rows="4" cols="50" placeholder='Temp Transcription' value={transcript}></textarea>
+      <button onClick={handleStartListening}>Start Mic</button>
+      <button onClick={handleStopListening}>Stop Mic</button>
+      <span>Microphone: {listening ? 'on' : 'off'}</span>
+      {/*<textarea className='transcription-box' rows="4" cols="50" placeholder='Temp Transcription' value={transcript}></textarea>*/}
     </div>
   );
 };
