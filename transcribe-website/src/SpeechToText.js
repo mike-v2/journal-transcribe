@@ -17,25 +17,25 @@ const SpeechToText = (props) => {
   useEffect(() => {
     let newText = finalTranscript.substring(voiceText.length);
     
+    //if first character is space, delete
+    newText = newText.replace(/^[\s\uFEFF\xA0]+/g, '');
+
     newText = newText.replace(/ *period/g, '.');
     newText = newText.replace(/ *comma/g, ',');
     newText = newText.replace(/ *question mark/g, '?');
     newText = newText.replace(/ *new line/g, '\n');
     newText = newText.replace(/ *semicolon/g, ';');
-    newText = newText.replace(/ *hyphen/g, '-');
-
-    //if first character is space, delete
-    newText = newText.trimStart();
-
-    //capitalize first letter. Assume transcript starting at new sentence
-    newText = newText.substring(0, 1).toUpperCase() + newText.substring(1);
-
-    newText = " " + newText;
+    newText = newText.replace(/ *hyphen/g, ' -');
+    newText = newText.replace(/ *tab/g, "   ");
 
     //capitalize first letter of sentence
     newText = newText.replace(/\. [a-z]/, function(match) {
       return match.toUpperCase();
     });
+
+    if (newText.endsWith('\n') === false) {
+      newText = newText + " ";
+    }
 
     console.log("new text = " + newText);
     setVoiceText(finalTranscript);
