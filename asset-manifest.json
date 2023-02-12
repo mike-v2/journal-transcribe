@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/journal-transcribe/static/css/main.6a002ed7.css",
-    "main.js": "/journal-transcribe/static/js/main.59c91c34.js",
+    "main.css": "/journal-transcribe/static/css/main.2ac6ca6d.css",
+    "main.js": "/journal-transcribe/static/js/main.b3a00169.js",
     "static/media/page-0120.jpg": "/journal-transcribe/static/media/page-0120.2a69ab0e781834deb46b.jpg",
     "static/media/page-0121.jpg": "/journal-transcribe/static/media/page-0121.1b9b606e1772fdcfee1b.jpg",
     "static/media/page-0217.jpg": "/journal-transcribe/static/media/page-0217.97f91174de5ced4fd73d.jpg",
@@ -235,11 +235,11 @@
     "static/media/page-0009.jpg": "/journal-transcribe/static/media/page-0009.df32b11d548a50b17af3.jpg",
     "static/media/page-0010.jpg": "/journal-transcribe/static/media/page-0010.1f561e9e8753708ce79e.jpg",
     "index.html": "/journal-transcribe/index.html",
-    "main.6a002ed7.css.map": "/journal-transcribe/static/css/main.6a002ed7.css.map",
-    "main.59c91c34.js.map": "/journal-transcribe/static/js/main.59c91c34.js.map"
+    "main.2ac6ca6d.css.map": "/journal-transcribe/static/css/main.2ac6ca6d.css.map",
+    "main.b3a00169.js.map": "/journal-transcribe/static/js/main.b3a00169.js.map"
   },
   "entrypoints": [
-    "static/css/main.6a002ed7.css",
-    "static/js/main.59c91c34.js"
+    "static/css/main.2ac6ca6d.css",
+    "static/js/main.b3a00169.js"
   ]
 }
