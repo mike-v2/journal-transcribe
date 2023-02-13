@@ -112,7 +112,11 @@ function App() {
     let currentText = transcriptionBox.current.value;
 
     //determine if new text needs a space at start
-    if (currentText != "" && text !== "" && text.startsWith('\n') === false && text.startsWith('   ') === false) {
+    if (currentText != "" && 
+        currentText.charAt(currentText.length - 1) !== " " && 
+        text !== "" && 
+        text.startsWith('\n') === false && 
+        text.startsWith('   ') === false) {
       text = " " + text;
     }
 
