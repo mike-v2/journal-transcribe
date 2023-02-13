@@ -106,35 +106,62 @@ function App() {
     update(ref(realtimeDB), updates);
   }
 
-  const updateVoiceText = (text) => {
-    if (text === "") return;
+  const updateVoiceText = (newText) => {
+    if (newText === '') return;
 
+    console.log(`new text unedited = "${newText}"`);
     let currentText = transcriptionBox.current.value;
 
-    //determine if new text needs a space at start
-    if (currentText != "" && 
-        currentText.charAt(currentText.length - 1) !== " " && 
-        text !== "" && 
-        text.startsWith('\n') === false && 
-        text.startsWith('   ') === false) {
-      text = " " + text;
+    //delete all the leading spaces
+    newText = newText.replace(/^[\s]+/, '');
+
+    //do this before replacing punctuation, so that unquote can be differentiated from quote - unquote is a snapChar but quote is not
+    const snapChars = /^period|comma|question mark|semicolon|colon|unquote/;
+    const startsWithSnapChar = snapChars.test(newText);
+    if (startsWithSnapChar) {
+      currentText = currentText.trimEnd();
     }
 
-    //capitalize first letter
-    for (let i = currentText.length - 1; i >= 0; i--) {
-      const c = currentText.charAt(i);
-      if (c === "." || c === "\n") {
-        let firstLetter = text.match(/[a-zA-Z]/);
-        if (firstLetter) {
-          const index = text.indexOf(firstLetter);
-          text = text.substring(0, index) + text.charAt(index).toUpperCase() + text.substring(index + 1);
-        }
-        break;
-      } else if (c === " ") continue;
-      else break;
+    newText = newText.replace(/\s*period/g, '.');
+    newText = newText.replace(/\s*comma/g, ',');
+    newText = newText.replace(/\s*question mark/g, '?');
+    newText = newText.replace(/\s*semicolon/g, ';');
+    newText = newText.replace(/\s*colon/g, ':');
+    newText = newText.replace(/\s*unquote\b/g, '"');
+
+    newText = newText.replace(/\bhyphen\b/g, '-');
+    newText = newText.replace(/\bquote\s?/g, '"');
+    newText = newText.replace(/\btab\b/g, '   ');
+    newText = newText.replace(/\bnew line\b/g, '\n');
+
+    //capitalize first letter of sentence
+    newText = newText.replace(/\. [a-z]/, function (match) {
+      return match.toUpperCase();
+    });
+
+    //add a space at the start if the end of currentText is a sentence ender
+    const endDoesNotNeedSpace = /[\s\b\n]$/;
+    const startDoesNotNeedSpace = /^[\s\b\n]/;
+    if (currentText.length > 0 && 
+        startsWithSnapChar === false &&
+        startDoesNotNeedSpace.test(newText) === false &&
+        endDoesNotNeedSpace.test(currentText) === false) {
+      newText = " " + newText;
+    }
+    
+    const sentenceEnd = /[.?!\n]\s*$/;
+    if (sentenceEnd.test(currentText)) {
+      let firstLetter = newText.match(/[a-zA-Z]/);
+      if (firstLetter) {
+        const index = newText.indexOf(firstLetter);
+        newText = newText.substring(0, index) + newText.charAt(index).toUpperCase() + newText.substring(index + 1);
+      }
     }
 
-    transcriptionBox.current.value += text;
+    console.log(`new text edited = "${newText}"`);
+
+    currentText += newText;
+    transcriptionBox.current.value = currentText;
   }
 
   function writeDateToTextArea(text) {

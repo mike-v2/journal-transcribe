@@ -17,28 +17,7 @@ const SpeechToText = (props) => {
   useEffect(() => {
     let newText = finalTranscript.substring(voiceText.length);
     
-    console.log(`new text unedited = "${newText}"`);
-
-    //delete all the leading spaces
-    newText = newText.replace(/^[\s]+/, '');
-
-    newText = newText.replace(/ *period/g, '.');
-    newText = newText.replace(/ *comma/g, ',');
-    newText = newText.replace(/ *question mark/g, '?');
-    newText = newText.replace(/\s?semicolon/g, ';');
-    newText = newText.replace(/ *colon/g, ':');
-    newText = newText.replace(/\bhyphen\b/g, '-');
-    newText = newText.replace(/\bquote\s?/g, '"');
-    newText = newText.replace(/ *unquote\b/g, '"');
-    newText = newText.replace(/\s?tab\s?/g, '   ');
-    newText = newText.replace(/\bnew line\b/g, '\n');
-
-    //capitalize first letter of sentence
-    newText = newText.replace(/\. [a-z]/, function(match) {
-      return match.toUpperCase();
-    });
-
-    console.log(`new text edited = "${newText}"`);
+    
     setVoiceText(finalTranscript);
     props.updateVoiceText(newText);
   }, [finalTranscript])
