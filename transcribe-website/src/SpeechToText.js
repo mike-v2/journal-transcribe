@@ -17,27 +17,28 @@ const SpeechToText = (props) => {
   useEffect(() => {
     let newText = finalTranscript.substring(voiceText.length);
     
-    //if first character is space, delete
-    newText = newText.replace(/^[\s\uFEFF\xA0]+/g, '');
+    console.log(`new text unedited = "${newText}"`);
+
+    //delete all the leading spaces
+    newText = newText.replace(/^[\s]+/, '');
 
     newText = newText.replace(/ *period/g, '.');
     newText = newText.replace(/ *comma/g, ',');
     newText = newText.replace(/ *question mark/g, '?');
-    newText = newText.replace(/ *new line/g, '\n');
-    newText = newText.replace(/ *semicolon/g, ';');
-    newText = newText.replace(/ *hyphen/g, ' -');
-    newText = newText.replace(/ *tab/g, "   ");
+    newText = newText.replace(/\s?semicolon/g, ';');
+    newText = newText.replace(/ *colon/g, ':');
+    newText = newText.replace(/\bhyphen\b/g, '-');
+    newText = newText.replace(/\bquote\s?/g, '"');
+    newText = newText.replace(/ *unquote\b/g, '"');
+    newText = newText.replace(/\s?tab\s?/g, '   ');
+    newText = newText.replace(/\bnew line\b/g, '\n');
 
     //capitalize first letter of sentence
     newText = newText.replace(/\. [a-z]/, function(match) {
       return match.toUpperCase();
     });
 
-    if (newText.endsWith('\n') === false) {
-      newText = newText + " ";
-    }
-
-    console.log("new text = " + newText);
+    console.log(`new text edited = "${newText}"`);
     setVoiceText(finalTranscript);
     props.updateVoiceText(newText);
   }, [finalTranscript])
@@ -65,7 +66,6 @@ const SpeechToText = (props) => {
       <button onClick={handleStartListening}>Start Mic</button>
       <button onClick={handleStopListening}>Stop Mic</button>
       <span>Microphone: {listening ? 'on' : 'off'}</span>
-      {/*<textarea className='transcription-box' rows="4" cols="50" placeholder='Temp Transcription' value={transcript}></textarea>*/}
     </div>
   );
 };

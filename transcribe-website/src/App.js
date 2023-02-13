@@ -107,14 +107,24 @@ function App() {
   }
 
   const updateVoiceText = (text) => {
+    if (text === "") return;
+
     let currentText = transcriptionBox.current.value;
 
-    //capitalize first letter. Assume transcript starting at new sentence
+    //determine if new text needs a space at start
+    if (currentText != "" && text !== "" && text.startsWith('\n') === false && text.startsWith('   ') === false) {
+      text = " " + text;
+    }
+
+    //capitalize first letter
     for (let i = currentText.length - 1; i >= 0; i--) {
       const c = currentText.charAt(i);
-      console.log('checking caps. last character = ' + c);
       if (c === "." || c === "\n") {
-        text = text.substring(0, 1).toUpperCase() + text.substring(1);
+        let firstLetter = text.match(/[a-zA-Z]/);
+        if (firstLetter) {
+          const index = text.indexOf(firstLetter);
+          text = text.substring(0, index) + text.charAt(index).toUpperCase() + text.substring(index + 1);
+        }
         break;
       } else if (c === " ") continue;
       else break;

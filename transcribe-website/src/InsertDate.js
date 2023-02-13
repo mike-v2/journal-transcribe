@@ -9,7 +9,7 @@ const InsertDate = (props) => {
   const [day, setDay] = useState("1");
 
   const handleInsertDate = (e) => {
-    const date = month + ". " + day + " " + year;
+    const date = "***" + month + ". " + day + " " + year + "***";
     writeDate(date);
   }
 
