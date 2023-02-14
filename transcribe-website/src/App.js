@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 import { initializeApp } from 'firebase/app';
 import SpeechToText from './SpeechToText';
 import InsertDate from './InsertDate';
-
 import { getDatabase, ref, onDisconnect, update, get } from "firebase/database";
 
 const year = '1948';
@@ -116,17 +115,18 @@ function App() {
     newText = newText.replace(/^[\s]+/, '');
 
     //do this before replacing punctuation, so that unquote can be differentiated from quote - unquote is a snapChar but quote is not
-    const snapChars = /^period|comma|question mark|semicolon|colon|unquote/;
+    const snapChars = /^\s*(period|comma|question mark|semicolon|colon|unquote)\b/;
     const startsWithSnapChar = snapChars.test(newText);
     if (startsWithSnapChar) {
+      console.log("new text starts with snap char. trimming end of current text");
       currentText = currentText.trimEnd();
     }
 
-    newText = newText.replace(/\s*period/g, '.');
-    newText = newText.replace(/\s*comma/g, ',');
+    newText = newText.replace(/\s*period\b/g, '.');
+    newText = newText.replace(/\s*comma\b/g, ',');
     newText = newText.replace(/\s*question mark/g, '?');
-    newText = newText.replace(/\s*semicolon/g, ';');
-    newText = newText.replace(/\s*colon/g, ':');
+    newText = newText.replace(/\s*semicolon\b/g, ';');
+    newText = newText.replace(/\s*colon\b/g, ':');
     newText = newText.replace(/\s*unquote\b/g, '"');
 
     newText = newText.replace(/\bhyphen\b/g, '-');
@@ -142,10 +142,13 @@ function App() {
     //add a space at the start if the end of currentText is a sentence ender
     const endDoesNotNeedSpace = /[\s\b\n]$/;
     const startDoesNotNeedSpace = /^[\s\b\n]/;
+    const startNeedsSpace = startDoesNotNeedSpace.test(newText) === false;
+    const endNeedsSpace = endDoesNotNeedSpace.test(currentText) === false;
+    console.log(`start needs space = ${startNeedsSpace}   end needs space = ${endNeedsSpace}`);
     if (currentText.length > 0 && 
         startsWithSnapChar === false &&
-        startDoesNotNeedSpace.test(newText) === false &&
-        endDoesNotNeedSpace.test(currentText) === false) {
+        startNeedsSpace &&
+        endNeedsSpace) {
       newText = " " + newText;
     }
     
@@ -233,7 +236,7 @@ function App() {
 
     transcriptionBox.current.value += "***article***";
   }
-
+  
   return (
     <div className="App">
       <div className='body'>
