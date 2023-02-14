@@ -8,11 +8,12 @@ import { getDatabase, ref, onDisconnect, update, get } from "firebase/database";
 const year = '1948';
 
 function App() {
-  const transcriptionBox = useRef(null);
   const [image, setImage] = useState(null);
-  const [completedIDs, setCompletedIDs] = useState([]);
+  const [completedIDs, setCompletedIDs] = useState({});
   const [currentID, setCurrentID] = useState("");
   const [realtimeDB, setRealtimeDB] = useState(null);
+  const [startTime, setStartTime] = useState(-1);
+  const [transcriptionText, setTranscriptionText] = useState('');
 
   const firebaseConfig = {
     apiKey: "AIzaSyAc1YOLbEfxfEGeJuLonxUTCdp7HmBD2Jw",
@@ -53,6 +54,10 @@ function App() {
     }
   }, [completedIDs]);
 
+  useEffect(() => {
+    if (startTime < 0) setStartTime(new Date().getTime());
+  }, [transcriptionText])
+
   async function displayNextJournalPage() {
     const pagesRef = ref(realtimeDB, '/pages/');
 
@@ -67,7 +72,7 @@ function App() {
           const isInProgress = data[page].isInProgress;
           console.log("checking page: " + imageID);
 
-          if (isCompleted === false && isInProgress === false && completedIDs.includes(imageID) === false) {
+          if (isCompleted === false && isInProgress === false && imageID in completedIDs === false) {
             console.log("Setting current id: " + imageID);
             setCurrentID(imageID);
             const pageNumber = getPageNumberFromImageID(imageID);
@@ -90,10 +95,10 @@ function App() {
     })
   }
 
-  async function setTranscription(text) {
+  async function setTranscription() {
     const updates = {};
     updates['pages/' + getFileNameFromImageID(currentID) + '/isCompleted'] = true;
-    updates['pages/' + getFileNameFromImageID(currentID) + '/text'] = text;
+    updates['pages/' + getFileNameFromImageID(currentID) + '/text'] = transcriptionText;
     update(ref(realtimeDB), updates);
   }
 
@@ -109,7 +114,7 @@ function App() {
     if (newText === '') return;
 
     console.log(`new text unedited = "${newText}"`);
-    let currentText = transcriptionBox.current.value;
+    let currentText = transcriptionText;
 
     //delete all the leading spaces
     newText = newText.replace(/^[\s]+/, '');
@@ -164,28 +169,30 @@ function App() {
     console.log(`new text edited = "${newText}"`);
 
     currentText += newText;
-    transcriptionBox.current.value = currentText;
+    setTranscriptionText(currentText);
   }
 
   function writeDateToTextArea(text) {
-    transcriptionBox.current.value += text;
-    transcriptionBox.current.value += "\n";
+    setTranscriptionText(transcriptionText + text + "\n");
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     console.log("Completed ID: " + currentID);
-    setCompletedIDs([...completedIDs, currentID]);
-    setTranscription(transcriptionBox.current.value);
+    let elapsedTime = (new Date().getTime() - startTime) / 1000;
+    
+    setCompletedIDs({...completedIDs, [currentID]: elapsedTime});
+    setTranscription();
     resetImage();
     displayNextJournalPage();
   }
 
   function resetImage() {
     releaseCurrentDocument();
-    transcriptionBox.current.value = "";
-    setCurrentID("");
+    setTranscriptionText('');
+    setCurrentID('');
+    setStartTime(-1);
   }
 
   function getFileNameFromPageNumber(pageNumber) {
@@ -228,13 +235,28 @@ function App() {
   const handleUnknownWord = (e) => {
     e.preventDefault();
 
-    transcriptionBox.current.value += "???";
+    setTranscriptionText(transcriptionText + "???");
   }
 
   const handleArticle = (e) => {
     e.preventDefault();
 
-    transcriptionBox.current.value += "***article***";
+    setTranscriptionText(transcriptionText + "***article***");
+  }
+
+  const handleTextAreaChange = (e) => {
+    setTranscriptionText(e.target.value);
+  }
+
+  function getFormattedElapsedTime(time) {
+    let minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+    seconds -= time % 1;
+    let secStr = seconds.toString();
+    if (seconds < 10) {
+      secStr = '0' + secStr;
+    }
+    return minutes.toString() + ':' + secStr;
   }
   
   return (
@@ -252,10 +274,10 @@ function App() {
           {/*<input type='button' value="Create New Firebase Entries" onClick={createBlankFirebaseEntries}></input>
             */}
 
-          <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" rows="20" cols="50" placeholder='Enter Transcription'></textarea>
+          <textarea className='transcription-box' name="transcription-box" rows="20" cols="50" placeholder='Enter Transcription' value={transcriptionText} onChange={handleTextAreaChange}></textarea>
           <input type='submit' value="Submit" onClick={handleSubmit}></input>
-          {completedIDs.map((id) => {
-            return <span className='completed-id'>{id}</span>;
+          {Object.keys(completedIDs).map((id) => {
+            return <span className='completed-id'>{id} {getFormattedElapsedTime(completedIDs[id])}</span>;
           })}
         </div>
       </div>
