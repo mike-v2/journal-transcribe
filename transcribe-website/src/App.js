@@ -138,6 +138,7 @@ function App() {
     newText = newText.replace(/\bquote\s?/g, '"');
     newText = newText.replace(/\btab\b/g, '   ');
     newText = newText.replace(/\bnew line\b/g, '\n');
+    newText = newText.replace(/\bnew paragraph\b/g, '\n   ');
 
     //capitalize first letter of sentence
     newText = newText.replace(/\. [a-z]/, function (match) {
