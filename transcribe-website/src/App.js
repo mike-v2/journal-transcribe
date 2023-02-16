@@ -70,7 +70,7 @@ function App() {
           const imageID = data[page].imageID;
           const isCompleted = data[page].isCompleted;
           const isInProgress = data[page].isInProgress;
-          console.log("checking page: " + imageID);
+          //console.log("checking page: " + imageID);
 
           if (isCompleted === false && isInProgress === false && imageID in completedIDs === false) {
             console.log("Setting current id: " + imageID);
@@ -89,7 +89,7 @@ function App() {
             return;
           }
 
-          console.log("no more images");
+          //console.log("no more images");
         }
       }
     })
@@ -262,23 +262,30 @@ function App() {
   return (
     <div className="App">
       <div className='body'>
-        <div className='image-container'>
-          <img src={image} className='image-box'></img>
-        </div>
-        <div className='form-container'>
-          <InsertDate year={year} writeDate={writeDateToTextArea} />
-          <button onClick={handleUnknownWord}>Unknown Word<br />???</button>
-          <button onClick={handleArticle}>Article<br />***article***</button>
-
+        <div className='buttons-container'>
           <SpeechToText updateVoiceText={updateVoiceText} />
-          {/*<input type='button' value="Create New Firebase Entries" onClick={createBlankFirebaseEntries}></input>
+          <InsertDate year={year} writeDate={writeDateToTextArea} />
+          <p className='help-info'><b>Date:</b> Insert the date using the button, but only for the dates that mark the start of a journal entry. Marking the start of each entry will allow us to sort and search the entries. If Harry references a date within an entry, just copy it as it appears.</p>
+          <button onClick={handleUnknownWord}>Unknown Word<br />???</button>
+          <p className='help-info'><b>Unknown Word:</b> the symbol to represent a word that cannot be identified is '???'. You can use the button to insert the symbol, or you can write it manually.</p>
+          <button onClick={handleArticle}>Article<br />***article***</button>
+          <p className='help-info'><b>Article:</b> if there is something attached to the page, like an news article, pamphlet, photo, etc., please use the special symbol somewhere in the text. You can use the button to insert the symbol, or you can write it manually.</p>
+        </div>
+        
+        {/*<input type='button' value="Create New Firebase Entries" onClick={createBlankFirebaseEntries}></input>
             */}
 
-          <textarea className='transcription-box' name="transcription-box" rows="20" cols="50" placeholder='Enter Transcription' value={transcriptionText} onChange={handleTextAreaChange}></textarea>
-          <input type='submit' value="Submit" onClick={handleSubmit}></input>
-          {Object.keys(completedIDs).map((id) => {
-            return <span className='completed-id'>{id} {getFormattedElapsedTime(completedIDs[id])}</span>;
-          })}
+        <div className='image-container'>
+          <img src={process.env.PUBLIC_URL + '/images/old_book_edited.png'} className='book-image'/>
+          <img src={image} className='page-image'></img>
+
+          <div className='text-container'>
+            <textarea className='transcription-box' name="transcription-box" placeholder='Enter Transcription' value={transcriptionText} onChange={handleTextAreaChange}></textarea>
+            <input type='submit' value="Submit" onClick={handleSubmit}></input>
+            {Object.keys(completedIDs).map((id) => {
+              return <span className='completed-id'>{id} {getFormattedElapsedTime(completedIDs[id])}</span>;
+            })}
+          </div>
         </div>
       </div>
     </div>

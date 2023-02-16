@@ -26,7 +26,7 @@ const InsertDate = (props) => {
   }
 
   return (
-    <div>
+    <div className="main">
       <select value={month} onChange={handleMonthChange}>
         <option value="Month" disabled>Month</option>
         <option value="Jan">Jan</option>
@@ -42,7 +42,7 @@ const InsertDate = (props) => {
         <option value="Nov">Nov</option>
         <option value="Dec">Dec</option>
       </select>
-      <input type='text' id="day-box" value={day} focu onChange={handleDayChange} maxLength='2'></input>
+      <input type='text' id="day-box" value={day} onChange={handleDayChange} maxLength='2'></input>
       <input type='text' id="year-box" value={year} disabled></input>
       <input type='button' onClick={handleInsertDate} value='Insert Date'></input>
     </div>

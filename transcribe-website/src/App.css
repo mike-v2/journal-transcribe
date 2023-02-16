@@ -1,33 +1,45 @@
 .App {
-  
+  background-color: rgb(124, 124, 124);
 }
 
 .body {
-  display: flex;
-  max-width: 1000px;
-  background-color: rgb(124, 124, 124);
+  max-width: 1700px;
   margin: auto auto;
 }
 
-.image-container {
-  max-width: 600px;
-  height: 800px;
-  flex: auto;
-}
-
-.image-box {
-  max-width: 100%;
-  float: right;
-}
-
-.form-container {
-  flex: auto;
+.buttons-container {
+  position: absolute;
+  top: 25%;
+  right: 0;
+  z-index: 10;
+  max-width: 10rem;
   display: flex;
   flex-direction: column;
+  background-color: gray;
+}
+
+.image-container {
+  position: relative;
+  display: flex;
+}
+
+.page-image {
+  position: absolute;
+  top: 5%;
+  left: 13%;
+  max-width: 37%;
+}
+
+.book-image {
+  width: 100%;
+}
+
+.text-container {
+  position: absolute;
+  top: 9%;
+  right: 15%;
   height: 100%;
-  max-width: 400px;
-  padding: 1rem;
-  padding-top: 4rem;
+  width: 30%;
 }
 
 .transcription-box {
@@ -37,8 +49,8 @@
   display: block;
 }
 
-.username-box {
-  display: block;
+.help-info {
+  font-size: small;
 }
 
 .completed-id {
