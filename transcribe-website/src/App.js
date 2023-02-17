@@ -32,8 +32,7 @@ function App() {
 
   useEffect(() => {
     const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    setRealtimeDB(db);
+    setRealtimeDB(getDatabase(app));
     
     //on unmount
     return () => {
