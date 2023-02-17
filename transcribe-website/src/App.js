@@ -26,8 +26,8 @@ function App() {
   };
 
   //webpack stores images on build
-  const images = importAll(require.context('../public/images/1948', false, /\.jpg/));
-  //console.log(`found ${Object.keys(images).length} images`);
+  const images = importAll(require.context('../public/images/1948', false, /\.png/));
+  console.log(`found ${Object.keys(images).length} images`);
   //console.log(images);
 
   useEffect(() => {
@@ -209,7 +209,7 @@ function App() {
 
   function importAll(r) {
     let images = {};
-    r.keys().map(item => { images[item.replace('./', '').replace('.jpg', '')] = r(item); });
+    r.keys().map(item => { images[item.replace('./', '').replace('.png', '')] = r(item); });
     return images;
   }
 
