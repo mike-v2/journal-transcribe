@@ -119,10 +119,12 @@ function App() {
     newText = newText.replace(/^[\s]+/, '');
 
     //do this before replacing punctuation, so that unquote can be differentiated from quote - unquote is a snapChar but quote is not
-    const snapChars = /^\s*(period|comma|question mark|semicolon|colon|unquote)\b/;
-    const startsWithSnapChar = snapChars.test(newText);
-    if (startsWithSnapChar) {
-      console.log("new text starts with snap char. trimming end of current text");
+    const startSnapChars = /^\s*(period|comma|question mark|semicolon|colon|unquote)\b/;
+    const endSnapChars = /\b(open parentheses|quote)\s*$/
+    const startsWithSnapChar = startSnapChars.test(newText);
+    const endsWithSnapChar = endSnapChars.test(currentText);
+    if (startsWithSnapChar || endsWithSnapChar) {
+      console.log("new text starts with snap char or old text ends with snap char. trimming end of current text");
       currentText = currentText.trimEnd();
     }
 
@@ -132,10 +134,13 @@ function App() {
     newText = newText.replace(/\s*semicolon\b/g, ';');
     newText = newText.replace(/\s*colon\b/g, ':');
     newText = newText.replace(/\s*unquote\b/g, '"');
+    newText = newText.replace(/\s*close parentheses\b/g, ')');
 
     newText = newText.replace(/\bhyphen\b/g, '-');
-    newText = newText.replace(/\bquote\s?/g, '"');
+    newText = newText.replace(/\bquote\s*/g, '"');
     newText = newText.replace(/\btab\b/g, '   ');
+    newText = newText.replace(/\btab\b/g, '   ');
+    newText = newText.replace(/\bopen parentheses\s*/g, '(');
     newText = newText.replace(/\bnew line\b/g, '\n');
     newText = newText.replace(/\bnew paragraph\b/g, '\n   ');
 
