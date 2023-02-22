@@ -1,5 +1,9 @@
+:root {
+  --transcription-text-size: 50%;
+}
+
 .App {
-  background-color: rgb(124, 124, 124);
+  
 }
 
 .body {
@@ -20,14 +24,14 @@
 
 .image-container {
   position: relative;
-  display: flex;
+  
 }
 
 .page-image {
   position: absolute;
-  top: 5%;
-  left: 13%;
-  max-width: 37%;
+  top: 1%;
+  left: 6%;
+  max-width: 45%;
 }
 
 .book-image {
@@ -36,17 +40,18 @@
 
 .text-container {
   position: absolute;
-  top: 9%;
-  right: 15%;
+  top: 5%;
+  right: 5%;
   height: 100%;
-  width: 30%;
+  width: 40%;
 }
 
 .transcription-box {
-  height: 70%;
+  height: 80%;
   width: 100%;
   padding: auto;
   display: block;
+  font-size: var(--transcription-text-size);
 }
 
 .help-info {

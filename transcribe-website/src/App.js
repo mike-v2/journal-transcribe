@@ -6,6 +6,8 @@ import InsertDate from './InsertDate';
 import { getDatabase, ref, onDisconnect, update, get } from "firebase/database";
 
 const year = '1948';
+const minTextSize = 1;
+const maxTextSize = 3;
 
 function App() {
   const [image, setImage] = useState(null);
@@ -14,6 +16,7 @@ function App() {
   const [realtimeDB, setRealtimeDB] = useState(null);
   const [startTime, setStartTime] = useState(-1);
   const [transcriptionText, setTranscriptionText] = useState('');
+  const transcriptionBox = useRef(null);
 
   const firebaseConfig = {
     apiKey: "AIzaSyAc1YOLbEfxfEGeJuLonxUTCdp7HmBD2Jw",
@@ -34,11 +37,37 @@ function App() {
     const app = initializeApp(firebaseConfig);
     setRealtimeDB(getDatabase(app));
     
+    window.addEventListener("resize", onResize);
     //on unmount
     return () => {
       console.log("Component UNMOUNTING");
     }
   }, []);
+
+  useEffect(() => {
+    onResize(null);
+  }, [transcriptionBox]);
+
+  const onResize = (e) => {
+    console.log("resized. transcription box width = " + window.innerWidth);
+    const widthFrac = inverseLerp(450, 1920, window.innerWidth);
+    
+    const textSize = lerp(minTextSize, maxTextSize, widthFrac);
+    const percent = Math.round(textSize * 100).toString() + "%";
+
+    if (transcriptionBox.current) {
+      transcriptionBox.current.style.setProperty("--transcription-text-size", percent);
+      console.log("setting text size percent to " + percent);
+    }
+  }
+
+  function inverseLerp(min, max, value) {
+    return (value - min) / (max - min);
+  }
+
+  function lerp(min, max, value) {
+    return value * (max - min) + min;
+  }
 
   useEffect(() => {
     if (realtimeDB && currentID === "") {
@@ -285,7 +314,7 @@ function App() {
           <img src={image} className='page-image'></img>
 
           <div className='text-container'>
-            <textarea className='transcription-box' name="transcription-box" placeholder='Enter Transcription' value={transcriptionText} onChange={handleTextAreaChange}></textarea>
+            <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" placeholder='Enter Transcription' value={transcriptionText} onChange={handleTextAreaChange}></textarea>
             <input type='submit' value="Submit" onClick={handleSubmit}></input>
             {Object.keys(completedIDs).map((id) => {
               return <span className='completed-id'>{id} {getFormattedElapsedTime(completedIDs[id])}</span>;
