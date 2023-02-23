@@ -313,10 +313,11 @@ function App() {
                 <InsertDate year={year} writeDate={writeDateToTextArea} />
                 <button onClick={handleUnknownWord}>Unknown Word<br />???</button>
                 <button onClick={handleArticle}>Article<br />***article***</button>
+                <input id='submit-button' type='submit' value="Submit" onClick={handleSubmit}></input>
               </div>
             </div>
             
-            <input type='submit' value="Submit" onClick={handleSubmit}></input>
+            
             {Object.keys(completedIDs).map((id) => {
               return <span className='completed-id'>{id} {getFormattedElapsedTime(completedIDs[id])}</span>;
             })}

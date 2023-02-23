@@ -48,9 +48,9 @@
 .box-buttons-container {
   position: absolute;
   top: 5%;
-  left: 50%;
+  left: 52%;
   height: 80%;
-  width: 51.7%;
+  width: 54%;
   display: flex;
 }
 
@@ -58,7 +58,7 @@
   width: 100%;
   height: 100%;
   font-size: var(--transcription-text-size);
-  background-color: rgb(216, 204, 190);
+  background-color: rgb(236, 217, 194);
 }
 
 .box-buttons {
@@ -73,4 +73,13 @@
 
 .completed-id {
   padding: .3rem;
+}
+
+#submit-button {
+  margin-top: 2rem;
+  border: 5px solid black;
+  border-radius: 5px;
+  min-height: 50px;
+  font-weight: 700;
+  font-size: large;
 }
