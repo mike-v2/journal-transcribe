@@ -4,6 +4,7 @@ import { initializeApp } from 'firebase/app';
 import SpeechToText from './SpeechToText';
 import InsertDate from './InsertDate';
 import { getDatabase, ref, onDisconnect, update, get } from "firebase/database";
+import oldBookImage from './images/old_book_edited.png'
 
 const year = '1948';
 const minTextSize = 1;
@@ -48,26 +49,7 @@ function App() {
     onResize(null);
   }, [transcriptionBox]);
 
-  const onResize = (e) => {
-    console.log("resized. transcription box width = " + window.innerWidth);
-    const widthFrac = inverseLerp(450, 1920, window.innerWidth);
-    
-    const textSize = lerp(minTextSize, maxTextSize, widthFrac);
-    const percent = Math.round(textSize * 100).toString() + "%";
-
-    if (transcriptionBox.current) {
-      transcriptionBox.current.style.setProperty("--transcription-text-size", percent);
-      console.log("setting text size percent to " + percent);
-    }
-  }
-
-  function inverseLerp(min, max, value) {
-    return (value - min) / (max - min);
-  }
-
-  function lerp(min, max, value) {
-    return value * (max - min) + min;
-  }
+  
 
   useEffect(() => {
     if (realtimeDB && currentID === "") {
@@ -292,6 +274,27 @@ function App() {
     }
     return minutes.toString() + ':' + secStr;
   }
+
+  const onResize = (e) => {
+    //console.log("resized. window width = " + window.innerWidth);
+    const widthFrac = inverseLerp(450, 1920, window.innerWidth);
+
+    const textSize = lerp(minTextSize, maxTextSize, widthFrac);
+    const percent = Math.round(textSize * 100).toString() + "%";
+
+    if (transcriptionBox.current) {
+      transcriptionBox.current.style.setProperty("--transcription-text-size", percent);
+      //console.log("setting text size percent to " + percent);
+    }
+  }
+
+  function inverseLerp(min, max, value) {
+    return (value - min) / (max - min);
+  }
+
+  function lerp(min, max, value) {
+    return value * (max - min) + min;
+  }
   
   return (
     <div className="App">
@@ -309,11 +312,11 @@ function App() {
         {/*<input type='button' value="Create New Firebase Entries" onClick={createBlankFirebaseEntries}></input>
             */}
 
-        <div className='image-container'>
-          <img src={process.env.PUBLIC_URL + '/images/old_book_edited.png'} className='book-image'/>
-          <img src={image} className='page-image'></img>
+        <div className='book-container' >
+          <div className='image-container'>
+            <img src={oldBookImage} className='book-image' />
+            <img src={image} className='page-image'></img>
 
-          <div className='text-container'>
             <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" placeholder='Enter Transcription' value={transcriptionText} onChange={handleTextAreaChange}></textarea>
             <input type='submit' value="Submit" onClick={handleSubmit}></input>
             {Object.keys(completedIDs).map((id) => {

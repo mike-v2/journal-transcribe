@@ -7,7 +7,6 @@
 }
 
 .body {
-  max-width: 1700px;
   margin: auto auto;
 }
 
@@ -22,36 +21,45 @@
   background-color: gray;
 }
 
+.book-container {
+  height: 950px;
+  display: flex;
+}
+
 .image-container {
   position: relative;
-  
+  height: 100%;
+  margin: auto;
+  flex: none;
+}
+
+.book-image {
+  height: 100%;
+  margin: auto;
 }
 
 .page-image {
   position: absolute;
-  top: 1%;
-  left: 6%;
-  max-width: 45%;
-}
-
-.book-image {
-  width: 100%;
+  top: -1em;
+  left: 3em;
+  height: 100%;
 }
 
 .text-container {
-  position: absolute;
-  top: 5%;
-  right: 5%;
   height: 100%;
-  width: 40%;
+  width: 20rem;
+  position: relative;
 }
 
 .transcription-box {
   height: 80%;
-  width: 100%;
+  width: 40%;
   padding: auto;
   display: block;
   font-size: var(--transcription-text-size);
+  position: absolute;
+  top: 5%;
+  left: 50%;
 }
 
 .help-info {
