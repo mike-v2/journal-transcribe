@@ -292,6 +292,12 @@ function App() {
   function lerp(min, max, value) {
     return value * (max - min) + min;
   }
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const toggleSidebar = (e) => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
   
   return (
     <div className="App">
@@ -324,7 +330,11 @@ function App() {
           </div>
         </div>
 
-        <div className='help-container'>
+        <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+          <button className='toggle-button' onClick={toggleSidebar}>
+            <h2>Help</h2>
+            <i className={`arrow-icon ${isSidebarOpen ? 'left' : 'right'}`} />
+          </button>
           <p className='help-info'><b>Date:</b> Insert the date using the button, but only for the dates that mark the start of a journal entry. Marking the start of each entry will allow us to sort and search the entries. If Harry references a date within an entry, just copy it as it appears.</p>
           <p className='help-info'><b>Unknown Word:</b> the symbol to represent a word that cannot be identified is '???'. You can use the button to insert the symbol, or you can write it manually.</p>
           <p className='help-info'><b>Article:</b> if there is something attached to the page, like an news article, pamphlet, photo, etc., please use the special symbol somewhere in the text. You can use the button to insert the symbol, or you can write it manually.</p>
