@@ -7,8 +7,8 @@ import { getDatabase, ref, onDisconnect, update, get } from "firebase/database";
 import oldBookImage from './images/old_book_edited.png'
 
 const year = '1948';
-const minTextSize = 1;
-const maxTextSize = 3;
+const minTextSize = .7;
+const maxTextSize = 2;
 
 function App() {
   const [image, setImage] = useState(null);
@@ -30,8 +30,8 @@ function App() {
   };
 
   //webpack stores images on build
-  const images = importAll(require.context('../public/images/1948', false, /\.png/));
-  console.log(`found ${Object.keys(images).length} images`);
+  //const images = importAll(require.context('../public/images/1948', false, /\.png/));
+  //console.log(`found ${Object.keys(images).length} images`);
   //console.log(images);
 
   useEffect(() => {
@@ -48,8 +48,6 @@ function App() {
   useEffect(() => {
     onResize(null);
   }, [transcriptionBox]);
-
-  
 
   useEffect(() => {
     if (realtimeDB && currentID === "") {
@@ -86,7 +84,8 @@ function App() {
             console.log("Setting current id: " + imageID);
             setCurrentID(imageID);
             const pageNumber = getPageNumberFromImageID(imageID);
-            console.log(`getting page number ${pageNumber}: ${images[getFileNameFromImageID(imageID)]}`);
+            const newImage = './images/1948/' + getFileNameFromImageID(imageID) + '.png';
+            console.log(`getting page number ${pageNumber}: ${newImage}`);
 
             const updates = {};
             updates['pages/' + getFileNameFromImageID(imageID) + '/isInProgress'] = true;
@@ -95,11 +94,9 @@ function App() {
             const isInProgressRef = ref(realtimeDB, 'pages/' + getFileNameFromImageID(imageID) + '/isInProgress');
             onDisconnect(isInProgressRef).set(false);
 
-            setImage(images[getFileNameFromPageNumber(pageNumber)]);
+            setImage(newImage);
             return;
           }
-
-          //console.log("no more images");
         }
       }
     })
@@ -230,7 +227,7 @@ function App() {
   }
 
   const createBlankFirebaseEntries = async (e) => {
-    console.log(`creating ${Object.keys(images).length} firebase entries`);
+    /* console.log(`creating ${Object.keys(images).length} firebase entries`);
     
     for (const imageID in images) {
       const pageNumStr = getPageNumberFromImageID(imageID);
@@ -245,7 +242,7 @@ function App() {
       const updates = {};
       updates['pages/' + getFileNameFromPageNumber(pageNumStr) + '/isInProgress'] = false;
       update(ref(realtimeDB), updates);
-    }
+    } */
   }
 
   const handleUnknownWord = (e) => {
@@ -299,30 +296,37 @@ function App() {
   return (
     <div className="App">
       <div className='body'>
-        <div className='buttons-container'>
-          <SpeechToText updateVoiceText={updateVoiceText} />
-          <InsertDate year={year} writeDate={writeDateToTextArea} />
-          <p className='help-info'><b>Date:</b> Insert the date using the button, but only for the dates that mark the start of a journal entry. Marking the start of each entry will allow us to sort and search the entries. If Harry references a date within an entry, just copy it as it appears.</p>
-          <button onClick={handleUnknownWord}>Unknown Word<br />???</button>
-          <p className='help-info'><b>Unknown Word:</b> the symbol to represent a word that cannot be identified is '???'. You can use the button to insert the symbol, or you can write it manually.</p>
-          <button onClick={handleArticle}>Article<br />***article***</button>
-          <p className='help-info'><b>Article:</b> if there is something attached to the page, like an news article, pamphlet, photo, etc., please use the special symbol somewhere in the text. You can use the button to insert the symbol, or you can write it manually.</p>
-        </div>
+        
         
         {/*<input type='button' value="Create New Firebase Entries" onClick={createBlankFirebaseEntries}></input>
             */}
 
-        <div className='book-container' >
-          <div className='image-container'>
+        <div className='book-parent' >
+          <div className='book-container'>
             <img src={oldBookImage} className='book-image' />
-            <img src={image} className='page-image'></img>
+            <img src={image} className='page-image' onError={(e) => console.log('Image failed to load:', e)} ></img>
 
-            <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" placeholder='Enter Transcription' value={transcriptionText} onChange={handleTextAreaChange}></textarea>
+            <div className='box-buttons-container'>
+              <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" placeholder='Enter Transcription' value={transcriptionText} onChange={handleTextAreaChange}></textarea>
+              <div className='box-buttons'>
+                <SpeechToText updateVoiceText={updateVoiceText} />
+                <InsertDate year={year} writeDate={writeDateToTextArea} />
+                <button onClick={handleUnknownWord}>Unknown Word<br />???</button>
+                <button onClick={handleArticle}>Article<br />***article***</button>
+              </div>
+            </div>
+            
             <input type='submit' value="Submit" onClick={handleSubmit}></input>
             {Object.keys(completedIDs).map((id) => {
               return <span className='completed-id'>{id} {getFormattedElapsedTime(completedIDs[id])}</span>;
             })}
           </div>
+        </div>
+
+        <div className='help-container'>
+          <p className='help-info'><b>Date:</b> Insert the date using the button, but only for the dates that mark the start of a journal entry. Marking the start of each entry will allow us to sort and search the entries. If Harry references a date within an entry, just copy it as it appears.</p>
+          <p className='help-info'><b>Unknown Word:</b> the symbol to represent a word that cannot be identified is '???'. You can use the button to insert the symbol, or you can write it manually.</p>
+          <p className='help-info'><b>Article:</b> if there is something attached to the page, like an news article, pamphlet, photo, etc., please use the special symbol somewhere in the text. You can use the button to insert the symbol, or you can write it manually.</p>
         </div>
       </div>
     </div>
