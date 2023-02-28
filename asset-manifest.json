@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/journal-transcribe/static/css/main.29b86c86.css",
-    "main.js": "/journal-transcribe/static/js/main.b521a67a.js",
+    "main.css": "/journal-transcribe/static/css/main.8c804186.css",
+    "main.js": "/journal-transcribe/static/js/main.cf53bd81.js",
     "static/media/old_book_edited.png": "/journal-transcribe/static/media/old_book_edited.af72f76a935d3570d274.png",
     "index.html": "/journal-transcribe/index.html",
-    "main.29b86c86.css.map": "/journal-transcribe/static/css/main.29b86c86.css.map",
-    "main.b521a67a.js.map": "/journal-transcribe/static/js/main.b521a67a.js.map"
+    "main.8c804186.css.map": "/journal-transcribe/static/css/main.8c804186.css.map",
+    "main.cf53bd81.js.map": "/journal-transcribe/static/js/main.cf53bd81.js.map"
   },
   "entrypoints": [
-    "static/css/main.29b86c86.css",
-    "static/js/main.b521a67a.js"
+    "static/css/main.8c804186.css",
+    "static/js/main.cf53bd81.js"
   ]
 }
