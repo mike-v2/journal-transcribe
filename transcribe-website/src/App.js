@@ -5,10 +5,22 @@ import SpeechToText from './SpeechToText';
 import InsertDate from './InsertDate';
 import { getDatabase, ref, onDisconnect, update, get } from "firebase/database";
 import oldBookImage from './images/old_book_edited.png'
+import InnerImageZoom from 'react-inner-image-zoom'
+import 'react-inner-image-zoom/lib/InnerImageZoom/styles.css';
 
 const year = '1948';
 const minTextSize = .7;
 const maxTextSize = 2;
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAc1YOLbEfxfEGeJuLonxUTCdp7HmBD2Jw",
+  authDomain: "journal-transcribe.firebaseapp.com",
+  projectId: "journal-transcribe",
+  storageBucket: "journal-transcribe.appspot.com",
+  messagingSenderId: "845025637508",
+  appId: "1:845025637508:web:2d1b689bb028146ed03ed1",
+  databaseURL: "https://journal-transcribe-default-rtdb.firebaseio.com"
+};
 
 function App() {
   const [image, setImage] = useState(null);
@@ -18,16 +30,6 @@ function App() {
   const [startTime, setStartTime] = useState(-1);
   const [transcriptionText, setTranscriptionText] = useState('');
   const transcriptionBox = useRef(null);
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAc1YOLbEfxfEGeJuLonxUTCdp7HmBD2Jw",
-    authDomain: "journal-transcribe.firebaseapp.com",
-    projectId: "journal-transcribe",
-    storageBucket: "journal-transcribe.appspot.com",
-    messagingSenderId: "845025637508",
-    appId: "1:845025637508:web:2d1b689bb028146ed03ed1",
-    databaseURL: "https://journal-transcribe-default-rtdb.firebaseio.com"
-  };
 
   //webpack stores images on build
   //const images = importAll(require.context('../public/images/1948', false, /\.png/));
@@ -84,7 +86,7 @@ function App() {
             console.log("Setting current id: " + imageID);
             setCurrentID(imageID);
             const pageNumber = getPageNumberFromImageID(imageID);
-            const newImage = './images/1948/' + getFileNameFromImageID(imageID) + '.png';
+            const newImage = process.env.PUBLIC_URL + '/images/1948/' + getFileNameFromImageID(imageID) + '.png';
             console.log(`getting page number ${pageNumber}: ${newImage}`);
 
             const updates = {};
@@ -308,7 +310,8 @@ function App() {
         <div className='book-parent' >
           <div className='book-container'>
             <img src={oldBookImage} className='book-image' />
-            <img src={image} className='page-image' onError={(e) => console.log('Image failed to load:', e)} ></img>
+            <InnerImageZoom src={image} zoomScale={2} className='page-image'/>
+            {/*<img src={image} className='page-image' onError={(e) => console.log('Image failed to load:', e)} ></img>*/}
 
             <div className='box-buttons-container'>
               <textarea ref={transcriptionBox} className='transcription-box' name="transcription-box" placeholder='Enter Transcription' value={transcriptionText} onChange={handleTextAreaChange}></textarea>
